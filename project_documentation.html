@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Live Football Flutter App Documentation - Features, setup, API, and customization guide.">
+  <title>Live Football App Documentation</title>
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; }
+    h1, h2, h3 { color: #0175C2; }
+    code, pre { background: #f0f0f0; border-radius: 4px; padding: 2px 6px; }
+    ul { margin-left: 24px; }
+    .api-link { color: #0175C2; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Live Football Flutter App Documentation</h1>
+    <h2>Overview</h2>
+    <p>A beautiful Flutter app for live football match streaming, scores, and news. Features theme switching, localization, AdMob ads, and persistent settings.</p>
+    <h2>Features</h2>
+    <ul>
+      <li>Live football match list and details</li>
+      <li>Video streaming for matches</li>
+      <li>Theme switching (light/dark)</li>
+      <li>Localization (English & Myanmar)</li>
+      <li>Persistent user settings</li>
+      <li>AdMob integration: banner, interstitial, native, app open ads</li>
+      <li>Drawer navigation</li>
+      <li>About & developer options screens</li>
+    </ul>
+    <h2>Requirements</h2>
+    <ul>
+      <li>Flutter 3.x or newer</li>
+      <li>Dart 2.18 or newer</li>
+      <li>Android/iOS/Web support</li>
+      <li>AdMob account (for production ads)</li>
+    </ul>
+    <h2>Installation</h2>
+    <ol>
+      <li>Clone the project:<br><code>git clone &lt;your-repo-url&gt;</code></li>
+      <li>Install dependencies:<br><code>flutter pub get</code></li>
+      <li>Run the app:<br><code>flutter run</code></li>
+    </ol>
+    <h2>AdMob Setup</h2>
+    <ul>
+      <li>Update <code>lib/ads_manager.dart</code> with your own AdMob unit IDs.</li>
+      <li>Add your AdMob App ID to <code>android/app/src/main/AndroidManifest.xml</code>.</li>
+    </ul>
+    <h2>Localization</h2>
+    <ul>
+      <li>Uses <a href="https://pub.dev/packages/easy_localization" target="_blank">easy_localization</a>.</li>
+      <li>Translation files in <code>assets/translations/</code>.</li>
+      <li>Change language in Settings screen.</li>
+    </ul>
+    <h2>API Setup</h2>
+    <ul>
+      <li>API logic in <code>lib/services/api_service.dart</code>.</li>
+      <li>Current API URL:<br><code>https://football-live-stream-api.p.rapidapi.com</code></li>
+      <li>API available for purchase/subscription at:<br><a class="api-link" href="https://rapidapi.com/Thawtarlamin/api/football-live-stream-api" target="_blank">RapidAPI - Football Live Stream API</a></li>
+    </ul>
+    <h2>Customization</h2>
+    <ul>
+      <li>Edit theme in <code>lib/theme_cubit.dart</code>.</li>
+      <li>Add new screens in <code>lib/screens/</code>.</li>
+      <li>Change API endpoint in <code>lib/services/api_service.dart</code>.</li>
+      <li>Change app name in <code>android/app/src/main/AndroidManifest.xml</code>.</li>
+    </ul>
+    <h2>Contact</h2>
+    <ul>
+      <li>Developer: IT Myanmar</li>
+      <li>Email: itmyanmar.dev@gmail.com</li>
+    </ul>
+    <hr>
+    <p style="color:#888;font-size:14px;">&copy; 2025 IT Myanmar. All rights reserved.</p>
+  </div>
+</body>
+</html>
