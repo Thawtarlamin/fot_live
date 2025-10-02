@@ -2,7 +2,8 @@ import '../exports.dart';
 
 class MatchCard extends StatelessWidget {
   final dynamic match;
-  const MatchCard({Key? key, required this.match}) : super(key: key);
+  MatchCard({Key? key, required this.match}) : super(key: key);
+  final ApiService _apiService = ApiService();
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +13,123 @@ class MatchCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {
+        onTap: () async {
           if (match['status'] == 'Live') {
-            Navigator.pushNamed(context, '/stream', arguments: match['id']);
+            // fetch stream url and navigate if available
+            BuildContext? dialogContext;
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext ctx) {
+                dialogContext = ctx;
+                return Dialog(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).cardColor.withAlpha(250),
+                          Theme.of(context).cardColor.withAlpha(235),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(31),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                      border: Border.all(
+                        color: Theme.of(context).dividerColor.withAlpha(20),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor.withAlpha(31),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: SizedBox(
+                              width: 26,
+                              height: 26,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                valueColor: AlwaysStoppedAnimation(
+                                  Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Preparing Stream...',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodyLarge?.color,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Connecting to live broadcast.\n Please wait.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.color,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+
+            try {
+              String? streamUrl = await _apiService.fetchStreamUrl(match['id']);
+              // Dismiss loading dialog
+              if (dialogContext != null) {
+                Navigator.of(dialogContext!).pop();
+              }
+
+              if (streamUrl.isNotEmpty) {
+                Navigator.pushNamed(context, '/stream', arguments: streamUrl);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Stream not available'.tr())),
+                );
+              }
+            } catch (e) {
+              if (dialogContext != null) {
+                Navigator.of(dialogContext!).pop();
+              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to load stream'.tr())),
+              );
+            }
           } else {
             ScaffoldMessenger.of(
               context,

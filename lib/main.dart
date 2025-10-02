@@ -103,7 +103,7 @@ class _MyAppState extends State<MyApp> {
                   body: Center(child: Text('No match selected'.tr())),
                 );
               }
-              return StreamPlayerScreen(matchId: matchId);
+              return StreamPlayerScreen(url: matchId);
             },
             '/settings': (context) => const SettingsScreen(),
             '/about': (context) => const AboutScreen(),

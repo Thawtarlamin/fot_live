@@ -34,6 +34,13 @@ class _MatchListScreenState extends State<MatchListScreen> {
     super.dispose();
   }
 
+  Future<void> _refreshMatches() async {
+    setState(() {
+      matches = _apiService.fetchMatches();
+    });
+    await matches;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +48,11 @@ class _MatchListScreenState extends State<MatchListScreen> {
         title: Text('Live Football Matches'.tr()),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh'.tr(),
+            onPressed: _refreshMatches,
+          ),
           BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {
               return IconButton(
@@ -168,58 +180,87 @@ class _MatchListScreenState extends State<MatchListScreen> {
             child: FutureBuilder<List<dynamic>>(
               future: matches,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Shimmer loading effect
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: 4,
-                    itemBuilder: (context, index) => Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Card(
-                        elevation: 4,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Container(height: 80),
-                      ),
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error, color: Colors.red, size: 48),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Error: ${snapshot.error}'.tr(),
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              matches = _apiService.fetchMatches();
-                            });
-                          },
-                          child: Text('Retry'.tr()),
-                        ),
-                      ],
-                    ),
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No matches found'.tr()));
-                }
-                final matchList = snapshot.data!;
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: matchList.length,
-                  itemBuilder: (context, index) {
-                    final match = matchList[index];
-                    return MatchCard(match: match);
-                  },
+                // Wrap all possible list/error/empty states in a RefreshIndicator
+                return RefreshIndicator(
+                  onRefresh: _refreshMatches,
+                  child: Builder(
+                    builder: (_) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        // Shimmer loading effect as a scrollable list
+                        return ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(16),
+                          itemCount: 4,
+                          itemBuilder: (context, index) => Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Card(
+                              elevation: 4,
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Container(height: 80),
+                            ),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(16),
+                          children: [
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.error,
+                                    color: Colors.red,
+                                    size: 48,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Error: ${snapshot.error}'.tr(),
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        matches = _apiService.fetchMatches();
+                                      });
+                                    },
+                                    child: Text('Retry'.tr()),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Text('No matches found'.tr()),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      final matchList = snapshot.data!;
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: matchList.length,
+                        itemBuilder: (context, index) {
+                          final match = matchList[index];
+                          return MatchCard(match: match);
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),
@@ -229,5 +270,3 @@ class _MatchListScreenState extends State<MatchListScreen> {
     );
   }
 }
-
-// ...existing code...
